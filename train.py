@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import mlflow
+import wandb
 from torchvision import datasets, transforms
 
 url = "https://activeeon-public.s3.eu-west-2.amazonaws.com/datasets/MNIST.new.tar.gz"
@@ -67,7 +68,11 @@ def test(args, model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0%})\n'.format(
         test_loss, correct, len(test_loader.dataset),
         correct / len(test_loader.dataset)))
+
     mlflow.log_metrics({
+        "Test Accuracy": 100. * correct / len(test_loader.dataset),
+        "Test Loss": test_loss})
+    wandb.log({
         "Test Accuracy": 100. * correct / len(test_loader.dataset),
         "Test Loss": test_loss})
 
@@ -75,6 +80,7 @@ def test(args, model, device, test_loader):
 def main():
 
     mlflow.set_experiment('pytorch-mnist')
+    wandb.init(project='pytorch-mnist')
 
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -98,6 +104,7 @@ def main():
     use_cuda = not args.no_cuda and torch.cuda.is_available()
 
     mlflow.log_params(vars(args))
+    wandb.config.update(args)
 
     torch.manual_seed(args.seed)
 

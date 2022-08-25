@@ -1,8 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-command: python train-wandb.py
+command: python train.py
 experiment_name: pytorch-mnist
-code: ./src
+code: ./
 environment: azureml:pytorch-wandb@latest
 compute: azureml:cpu-cluster
 environment_variables:
-  WANDB_API_KEY: "API Key"
+  WANDB_API_KEY: "API KEY"

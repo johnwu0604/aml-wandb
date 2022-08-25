@@ -1,6 +1,0 @@
-$schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-command: python train-mlflow.py
-experiment_name: pytorch-mnist
-code: ./src
-environment: azureml:pytorch-wandb@latest
-compute: azureml:cpu-cluster
