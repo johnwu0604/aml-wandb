@@ -1,26 +1,16 @@
 from __future__ import print_function
 
 import argparse
-# workaround to fetch MNIST data
 import os
 import sys
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-import torchvision
-import wandb
+import mlflow
 from torchvision import datasets, transforms
 
-tv_version = torchvision.__version__
-print("torchvision version:", tv_version, file=sys.stderr)
-if tuple(map(lambda x: int(x), tv_version.split(".")[:2])) <= (0, 5):
-    url = "https://activeeon-public.s3.eu-west-2.amazonaws.com/datasets/MNIST.old.tar.gz"
-else:
-    url = "https://activeeon-public.s3.eu-west-2.amazonaws.com/datasets/MNIST.new.tar.gz"
-print("download:", url, file=sys.stderr)
-
+url = "https://activeeon-public.s3.eu-west-2.amazonaws.com/datasets/MNIST.new.tar.gz"
 os.system("wget -O MNIST.tar.gz {}".format(url))
 os.system("tar -zxvf MNIST.tar.gz")
 
@@ -77,21 +67,14 @@ def test(args, model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0%})\n'.format(
         test_loss, correct, len(test_loader.dataset),
         correct / len(test_loader.dataset)))
-    wandb.log({
+    mlflow.log_metrics({
         "Test Accuracy": 100. * correct / len(test_loader.dataset),
         "Test Loss": test_loss})
 
 
 def main():
 
-    # Workaround torchvision bug
-    # https://github.com/pytorch/vision/issues/1938
-    from six.moves import urllib
-    opener = urllib.request.build_opener()
-    opener.addheaders = [('User-agent', 'Mozilla/5.0')]
-    urllib.request.install_opener(opener)
-
-    wandb.init(project='pytorch-mnist')
+    mlflow.set_experiment('pytorch-mnist')
 
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -114,7 +97,8 @@ def main():
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
 
-    wandb.config.update(args)
+    mlflow.log_params(vars(args))
+
     torch.manual_seed(args.seed)
 
     device = torch.device("cuda" if use_cuda else "cpu")
