@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import torchvision
-import wandb
+import mlflow
 from torchvision import datasets, transforms
 
 tv_version = torchvision.__version__
@@ -77,7 +77,7 @@ def test(args, model, device, test_loader):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0%})\n'.format(
         test_loss, correct, len(test_loader.dataset),
         correct / len(test_loader.dataset)))
-    wandb.log({
+    mlflow.log_metrics({
         "Test Accuracy": 100. * correct / len(test_loader.dataset),
         "Test Loss": test_loss})
 
@@ -90,8 +90,6 @@ def main():
     opener = urllib.request.build_opener()
     opener.addheaders = [('User-agent', 'Mozilla/5.0')]
     urllib.request.install_opener(opener)
-
-    wandb.init(project='pytorch-mnist')
 
     # Training settings
     parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
@@ -114,7 +112,8 @@ def main():
     args = parser.parse_args()
     use_cuda = not args.no_cuda and torch.cuda.is_available()
 
-    wandb.config.update(args)
+    mlflow.log_params(vars(args))
+
     torch.manual_seed(args.seed)
 
     device = torch.device("cuda" if use_cuda else "cpu")

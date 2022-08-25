@@ -1,7 +1,5 @@
 $schema: https://azuremlschemas.azureedge.net/latest/commandJob.schema.json
-command: python train-wandb.py
+command: python train-mlflow.py
 code: ./
 environment: azureml:pytorch-wandb@latest
 compute: azureml:cpu-cluster
-environment_variables:
-  WANDB_API_KEY: "KEY HERE"
